@@ -42,11 +42,7 @@ public class FireStationController {
             return ResponseEntity.notFound().build();
         }
     }
-    /*
-    @GetMapping("/firestation")
-    public List<FireStationCoverageDTO> getFireStationCoverage(@RequestParam("stationNumber") int stationNumber) {
-        return fireStationService.getFireStationCoverage(stationNumber);
-    }*/
+   
 
     @PostMapping
     public ResponseEntity<String> addFireStation(@RequestBody FireStation fireStation) {

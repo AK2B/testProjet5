@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Repository;
@@ -18,16 +19,25 @@ import com.SafetyNet.alerts.model.Person;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.annotation.PostConstruct;
+
 @Repository
 public class DataRepository {
     private static final Logger logger = LogManager.getLogger(DataRepository.class);
 
     private final ResourceLoader resourceLoader;
     private final ObjectMapper objectMapper;
+    private Data data;
 
+    @Autowired
     public DataRepository(ResourceLoader resourceLoader, ObjectMapper objectMapper) {
         this.resourceLoader = resourceLoader;
         this.objectMapper = objectMapper;
+    }
+
+    @PostConstruct
+    public void loadData() {
+        data = getData();
     }
 
     /**
@@ -36,6 +46,10 @@ public class DataRepository {
      * @return Les données récupérées, ou null en cas d'erreur.
      */
     public Data getData() {
+        if (data != null) {
+            return data; // Retourne les données déjà chargées si elles existent
+        }
+
         try {
             // Charger data.json via resourceLoader
             Resource resource = resourceLoader.getResource("classpath:data.json");
@@ -44,7 +58,7 @@ public class DataRepository {
             // Désérialiser le JSON en tant qu'arbre d'instances JsonNode
             JsonNode rootNode = objectMapper.readTree(inputStream);
 
-            // Traiter les données lues
+         // Traiter les données lues
             List<Person> persons = new ArrayList<>();
             JsonNode personsNode = rootNode.get("persons");
 
@@ -62,7 +76,7 @@ public class DataRepository {
                     persons.add(person);     
                 }
                                
-            } 
+            }  
            
             List<FireStation> fireStations = new ArrayList<>();
             JsonNode fireStationsNode = rootNode.get("firestations");
@@ -105,11 +119,14 @@ public class DataRepository {
                 } 
             }
 
+
             logger.info("Données récupérées avec succès.");
-            return new Data(persons, fireStations, medicalRecords);
+            data = new Data(persons, fireStations, medicalRecords);
+            return data;
         } catch (IOException e) {
             logger.error("Erreur lors de la récupération des données.", e);
             return null;
         }
     }
 }
+

@@ -1,6 +1,6 @@
 package com.SafetyNet.Alerts;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -62,7 +62,7 @@ public class DataRepositoryTest {
         Data actualData = dataRepository.getData();
 
         //THEN
-        assertNotNull(actualData);
+        assertThat(actualData).isNotNull();
         // Add assertions to verify data parsing and processing
 
         verify(resourceLoader, times(1)).getResource("classpath:data.json");
