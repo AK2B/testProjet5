@@ -8,22 +8,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.SafetyNet.alerts.DTO.FireStationCoverageDTO;
-import com.SafetyNet.alerts.services.DTOService;
+import com.SafetyNet.alerts.models.alerts.FireStationCoverage;
+import com.SafetyNet.alerts.services.AlertsService;
 
 @RestController
 @RequestMapping("/firestation")
 public class FireStationCoverageController {
 	
-    private DTOService dtoService;
+    private AlertsService dtoService;
 
     @Autowired
-    public FireStationCoverageController(DTOService dtoService) {
+    public FireStationCoverageController(AlertsService dtoService) {
         this.dtoService = dtoService;
     }
 
     @GetMapping
-    public List<FireStationCoverageDTO> getFireStationCoverage(@RequestParam("stationNumber") int fireStationNumber) {
+    public List<FireStationCoverage> getFireStationCoverage(@RequestParam("stationNumber") int fireStationNumber) {
         return dtoService.getFireStationCoverage(fireStationNumber);
     }
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.SafetyNet.alerts.model.FireStation;
+import com.SafetyNet.alerts.models.FireStation;
 import com.SafetyNet.alerts.services.FireStationService;
 
 @RestController

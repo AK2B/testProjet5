@@ -8,23 +8,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.SafetyNet.alerts.DTO.PersonInfoDTO;
-import com.SafetyNet.alerts.services.DTOService;
+import com.SafetyNet.alerts.models.alerts.PersonInfo;
+import com.SafetyNet.alerts.services.AlertsService;
 
 @RestController
 @RequestMapping("/personInfo")
 public class PersonInfoController {
     
-	private DTOService dtoService;
+	private AlertsService dtoService;
 
     @Autowired
-    public PersonInfoController(DTOService dtoService) {
+    public PersonInfoController(AlertsService dtoService) {
         this.dtoService = dtoService;
     }
 
     @GetMapping
-    public List<PersonInfoDTO> getPersonInfo(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
-    	return dtoService.getPersonInfoDTO(firstName, lastName);
+    public List<PersonInfo> getPersonInfo(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
+    	return dtoService.getPersonInfo(firstName, lastName);
     }
     
 }

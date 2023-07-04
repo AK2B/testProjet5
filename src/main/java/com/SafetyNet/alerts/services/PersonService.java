@@ -1,41 +1,54 @@
 package com.SafetyNet.alerts.services;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.SafetyNet.alerts.model.Person;
-import com.SafetyNet.alerts.repository.PersonRepository;
+import com.SafetyNet.alerts.dao.PersonDAO;
+import com.SafetyNet.alerts.models.Person;
 
 @Service
 public class PersonService {
 
-    private final PersonRepository personRepository;  
-    
-    @Autowired
-    public PersonService(PersonRepository personRepository) {
-        this.personRepository = personRepository;	
-    }
+	private final PersonDAO personDAO;
+	
+	@Autowired
+	public PersonService(PersonDAO personDAO) {
+		this.personDAO = personDAO;
+	}
 
-    public List<Person> getAllPersons() {
-        return personRepository.getAllPersons();
-    }
+	// Business logic
 
-    public Person getPersonById(String id) {
-        return personRepository.getPersonById(id);
-    }
+	public List<Person> getAllPersons() {
+		return personDAO.getAllPersons();
+	}
 
-    public void addPerson(Person person) {
-        personRepository.addPerson(person);
-    }
+	public Person getPersonById(String id) {
+		return getAllPersons().stream().filter(person -> person.getId().equals(id)).findFirst()
+				.orElse(null);
+	}
 
-    public void updatePerson(Person person) {
-        personRepository.updatePerson(person);
-    }
+	public List<Person> getPersonByAddress(String address) {
+		return getAllPersons().stream().filter(person -> person.getAddress().equals(address))
+				.collect(Collectors.toList());
+	}
 
-    public void deletePerson(String firstName, String lastName) {
-        personRepository.deletePerson(firstName, lastName);
-    }
-    
+	public List<Person> getPersonByCity(String city) {
+		return getAllPersons().stream().filter(person -> person.getCity().equals(city))
+				.collect(Collectors.toList());
+	}
+
+	public void addPerson(Person person) {
+		personDAO.addPerson(person);
+	}
+
+	public void updatePerson(Person person) {
+		personDAO.updatePerson(person);
+	}
+
+	public void deletePerson(String firstName, String lastName) {
+		personDAO.deletePerson(firstName, lastName);
+	}
 }

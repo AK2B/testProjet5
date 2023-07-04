@@ -1,45 +1,46 @@
 package com.SafetyNet.alerts.services;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.SafetyNet.alerts.model.FireStation;
-import com.SafetyNet.alerts.repository.FireStationRepository;
+import com.SafetyNet.alerts.dao.FireStationDAO;
+import com.SafetyNet.alerts.models.FireStation;
 
 @Service
 public class FireStationService {
-	 private final FireStationRepository fireStationRepository;
-	    
+	private final FireStationDAO fireStationDAO;
 
-    public FireStationService(FireStationRepository fireStationRepository) {
-    	this.fireStationRepository = fireStationRepository;
-       
-    }
+	@Autowired
+	public FireStationService(FireStationDAO fireStationDAO) {
+		this.fireStationDAO = fireStationDAO;
+	}
 
-    public List<FireStation> getAllFireStations() {
-        return fireStationRepository.getAllFireStations();
-    }
+	public List<FireStation> getAllFireStations() {
+		return fireStationDAO.getAllFireStations();
+	}
 
-    public FireStation getFireStationByAddress(String address) {
-        return fireStationRepository.getFireStationByAddress(address);
-    }
+	public FireStation getFireStationByAddress(String address) {
+		return getAllFireStations().stream().filter(fireStation -> fireStation.getAddress().equals(address)).findFirst()
+				.orElse(null);
+	}
 
-    public List<FireStation> getFireStationByStation(int station) {
-        return fireStationRepository.getFireStationByStation(station);
-    }
+	public List<FireStation> getFireStationByStation(String station) {
+		return getAllFireStations().stream().filter(fireStation -> fireStation.getStation().equals(station))
+				.collect(Collectors.toList());
+	}
 
-    public void addFireStation(FireStation fireStation) {
-        fireStationRepository.addFireStation(fireStation);
-    }
+	public void addFireStation(FireStation fireStation) {
+		fireStationDAO.addFireStation(fireStation);
+	}
 
-    public void updateFireStation(FireStation fireStation) {
-        fireStationRepository.updateFireStation(fireStation);
-    }
+	public void updateFireStation(FireStation fireStation) {
+		fireStationDAO.updateFireStation(fireStation);
+	}
 
-    public void deleteFireStation(String address) {
-        fireStationRepository.deleteFireStation(address);
-    }
-
+	public void deleteFireStation(String address) {
+		fireStationDAO.deleteFireStation(address);
+	}
 }
-

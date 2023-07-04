@@ -1,15 +1,15 @@
-package com.SafetyNet.alerts.DTO;
+package com.SafetyNet.alerts.models.alerts;
 
 import lombok.Data;
 
 @Data
-public class InfoPersonDTO {
+public class InfoPerson {
     private String firstName;
     private String lastName;
     private String address;
     private String email;
 
-    public InfoPersonDTO(String firstName, String lastName, String address, String email) {
+    public InfoPerson(String firstName, String lastName, String address, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;

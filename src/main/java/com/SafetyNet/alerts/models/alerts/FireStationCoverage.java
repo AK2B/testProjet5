@@ -1,16 +1,16 @@
-package com.SafetyNet.alerts.DTO;
+package com.SafetyNet.alerts.models.alerts;
 
 import java.util.List;
 
 import lombok.Data;
 
 @Data
-public class FireStationCoverageDTO {
+public class FireStationCoverage {
     
 	private String address;
     private int numAdults;
     private int numChildren;
-    private List<PersonCoverageDTO> persons;
+    private List<PersonCoverage> persons;
     
 }
 

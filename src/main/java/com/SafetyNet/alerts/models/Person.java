@@ -1,4 +1,4 @@
-package com.SafetyNet.alerts.model;
+package com.SafetyNet.alerts.models;
 
 import lombok.Data;
 

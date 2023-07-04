@@ -5,20 +5,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.SafetyNet.alerts.DTO.FireDTO;
-import com.SafetyNet.alerts.services.DTOService;
+import com.SafetyNet.alerts.models.alerts.Fire;
+import com.SafetyNet.alerts.services.AlertsService;
 
 @RestController
 public class FireController {
-    private DTOService dtoService;
+    private AlertsService dtoService;
 	
     @Autowired
-	public FireController(DTOService dtoService) {
+	public FireController(AlertsService dtoService) {
 		this.dtoService = dtoService;
     }
     
     @GetMapping("/fire")
-    public FireDTO getFireDetails(@RequestParam("address") String address) {
+    public Fire getFireDetails(@RequestParam("address") String address) {
         return dtoService.getFireInformation(address);
     }
 }

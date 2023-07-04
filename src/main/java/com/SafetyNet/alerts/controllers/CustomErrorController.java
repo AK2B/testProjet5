@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.SafetyNet.alerts.DTO.ErrorDTO;
+import com.SafetyNet.alerts.models.Error;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -29,16 +29,16 @@ public class CustomErrorController extends AbstractErrorController {
     }
 
     @RequestMapping
-    public ResponseEntity<ErrorDTO> handleCustomError(HttpServletRequest request) {
+    public ResponseEntity<Error> handleCustomError(HttpServletRequest request) {
         HttpStatus status = getResponseStatus(request);
         ErrorProperties errorProperties = getErrorProperties();
 
-        ErrorDTO errorDTO = new ErrorDTO();
-        errorDTO.setStatus(status.value());
-        errorDTO.setError(status.getReasonPhrase());
-        errorDTO.setMessage(errorProperties.getIncludeMessage());
+        Error error = new Error();
+        error.setStatus(status.value());
+        error.setError(status.getReasonPhrase());
+        error.setMessage(errorProperties.getIncludeMessage());
 
-        return new ResponseEntity<>(errorDTO, status);
+        return new ResponseEntity<>(error, status);
     }
 
     private HttpStatus getResponseStatus(HttpServletRequest request) {

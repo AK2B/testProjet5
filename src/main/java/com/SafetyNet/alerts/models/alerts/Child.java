@@ -1,4 +1,4 @@
-package com.SafetyNet.alerts.DTO;
+package com.SafetyNet.alerts.models.alerts;
 
 import lombok.Data;
 
@@ -6,12 +6,12 @@ import lombok.Data;
  * Classe représentant un enfant.
  */
 @Data
-public class ChildDTO {
+public class Child {
     private String firstName;
     private String lastName;
     private int age;
 
-    public ChildDTO(String firstName, String lastName, int age) {
+    public Child(String firstName, String lastName, int age) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;

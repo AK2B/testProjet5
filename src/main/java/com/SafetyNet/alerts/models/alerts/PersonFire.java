@@ -1,13 +1,13 @@
-package com.SafetyNet.alerts.DTO;
+package com.SafetyNet.alerts.models.alerts;
 
 import java.util.List;
 
-import com.SafetyNet.alerts.model.MedicalRecord;
+import com.SafetyNet.alerts.models.MedicalRecord;
 
 import lombok.Data;
 
 @Data
-public class PersonFireDTO {
+public class PersonFire {
 	
     private String firstName;
     private String lastName;
@@ -15,7 +15,7 @@ public class PersonFireDTO {
     private int age;
     private MedicalRecord medicalRecord;
     
-	public PersonFireDTO(String firstName, String lastName, String phone, int age, MedicalRecord medicalRecord) {
+	public PersonFire(String firstName, String lastName, String phone, int age, MedicalRecord medicalRecord) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;

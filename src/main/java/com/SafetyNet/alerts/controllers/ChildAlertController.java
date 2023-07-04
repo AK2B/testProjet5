@@ -6,21 +6,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.SafetyNet.alerts.DTO.ChildAlertDTO;
-import com.SafetyNet.alerts.services.DTOService;
+import com.SafetyNet.alerts.models.alerts.ChildAlert;
+import com.SafetyNet.alerts.services.AlertsService;
 
 @RestController
 @RequestMapping("/childAlert")
 public class ChildAlertController {
-    private DTOService dtoService;
+    private AlertsService dtoService;
 
     @Autowired
-    public ChildAlertController(DTOService dtoService) {
+    public ChildAlertController(AlertsService dtoService) {
         this.dtoService = dtoService;
     }
 
     @GetMapping
-    public ChildAlertDTO getChildAlert(@RequestParam("address") String address) throws Exception {
+    public ChildAlert getChildAlert(@RequestParam("address") String address) throws Exception {
         return dtoService.getChildAlert(address);
         
     }
