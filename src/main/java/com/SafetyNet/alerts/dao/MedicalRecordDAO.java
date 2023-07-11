@@ -18,12 +18,15 @@ public class MedicalRecordDAO {
         this.medicalRecords = dataConfig.getMedicalRecords();
     }
 
-    // CRUD operations only
-
     public List<MedicalRecord> getAllMedicalRecords() {
         return medicalRecords;
     }
 
+    public MedicalRecord getMedicalRecordByFullName(String firstName, String lastName) {
+		return getAllMedicalRecords().stream().filter(medicalRecord -> medicalRecord.getFirstName().equals(firstName)
+				&& medicalRecord.getLastName().equals(lastName)).findFirst().orElse(null);
+	}
+    
     public void addMedicalRecord(MedicalRecord medicalRecord) {
         medicalRecords.add(medicalRecord);
     }

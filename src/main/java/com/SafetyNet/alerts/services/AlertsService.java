@@ -5,40 +5,43 @@ import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import com.SafetyNet.alerts.dao.FireStationDAO;
+import com.SafetyNet.alerts.dao.MedicalRecordDAO;
+import com.SafetyNet.alerts.dao.PersonDAO;
+import com.SafetyNet.alerts.models.Child;
+import com.SafetyNet.alerts.models.ChildAlert;
+import com.SafetyNet.alerts.models.CommunityEmail;
+import com.SafetyNet.alerts.models.Fire;
 import com.SafetyNet.alerts.models.FireStation;
+import com.SafetyNet.alerts.models.FireStationCoverage;
+import com.SafetyNet.alerts.models.Flood;
+import com.SafetyNet.alerts.models.InfoPerson;
 import com.SafetyNet.alerts.models.MedicalRecord;
 import com.SafetyNet.alerts.models.Person;
-import com.SafetyNet.alerts.models.alerts.Child;
-import com.SafetyNet.alerts.models.alerts.ChildAlert;
-import com.SafetyNet.alerts.models.alerts.CommunityEmail;
-import com.SafetyNet.alerts.models.alerts.Fire;
-import com.SafetyNet.alerts.models.alerts.FireStationCoverage;
-import com.SafetyNet.alerts.models.alerts.Flood;
-import com.SafetyNet.alerts.models.alerts.InfoPerson;
-import com.SafetyNet.alerts.models.alerts.PersonCoverage;
-import com.SafetyNet.alerts.models.alerts.PersonFire;
-import com.SafetyNet.alerts.models.alerts.PersonFlood;
-import com.SafetyNet.alerts.models.alerts.PersonInfo;
-import com.SafetyNet.alerts.models.alerts.PhoneAlert;
+import com.SafetyNet.alerts.models.PersonCoverage;
+import com.SafetyNet.alerts.models.PersonFire;
+import com.SafetyNet.alerts.models.PersonFlood;
+import com.SafetyNet.alerts.models.PersonInfo;
+import com.SafetyNet.alerts.models.PhoneAlert;
 
 @Service
 public class AlertsService {
 	private static final Logger logger = LogManager.getLogger(AlertsService.class);
 
-	private PersonService personService;
-	private FireStationService fireStationService;
-	private MedicalRecordService medicalRecordService;
+	private PersonDAO personDAO;
+	private FireStationDAO fireStationDAO;
+	private MedicalRecordDAO medicalRecordDAO;
 
-	public AlertsService(PersonService personService, FireStationService fireStationService,
-			MedicalRecordService medicalRecordService) {
-		this.personService = personService;
-		this.fireStationService = fireStationService;
-		this.medicalRecordService = medicalRecordService;
+	public AlertsService(PersonDAO personDAO, FireStationDAO fireStationDAO, MedicalRecordDAO medicalRecordDAO) {
+		this.personDAO = personDAO;
+		this.fireStationDAO = fireStationDAO;
+		this.medicalRecordDAO = medicalRecordDAO;
 	}
 
 	/**
@@ -56,12 +59,12 @@ public class AlertsService {
 
 		try {
 			// Récupérer toutes les personnes depuis le référentiel
-			List<Person> persons = personService.getAllPersons();
+			List<Person> persons = personDAO.getAllPersons();
 
 			for (Person person : persons) {
 				if (person.getFirstName().equals(firstName) && person.getLastName().equals(lastName)) {
 					// Récupérer le dossier médical de la personne
-					MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.getFirstName(),
+					MedicalRecord medicalRecord = medicalRecordDAO.getMedicalRecordByFullName(person.getFirstName(),
 							person.getLastName());
 
 					if (medicalRecord != null) {
@@ -74,8 +77,8 @@ public class AlertsService {
 
 						// Créer un objet PersonInfo avec les informations de la personne et le
 						// dossier médical
-						PersonInfo personInfo = new PersonInfo(infoPerson, age,
-								medicalRecord.getMedications(), medicalRecord.getAllergies());
+						PersonInfo personInfo = new PersonInfo(infoPerson, age, medicalRecord.getMedications(),
+								medicalRecord.getAllergies());
 						personInfos.add(personInfo);
 					}
 				}
@@ -124,8 +127,8 @@ public class AlertsService {
 	 * du foyer.
 	 *
 	 * @param address l'adresse pour laquelle récupérer les informations
-	 * @return un objet ChildAlert contenant la liste des enfants et les membres
-	 *         du foyer
+	 * @return un objet ChildAlert contenant la liste des enfants et les membres du
+	 *         foyer
 	 * @throws Exception si une erreur se produit lors de la récupération des
 	 *                   informations
 	 */
@@ -134,11 +137,11 @@ public class AlertsService {
 		List<Person> householdMembers = new ArrayList<>();
 
 		try {
-			List<Person> persons = personService.getAllPersons();
+			List<Person> persons = personDAO.getAllPersons();
 
 			for (Person person : persons) {
 				if (person.getAddress().equals(address)) {
-					MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.getFirstName(),
+					MedicalRecord medicalRecord = medicalRecordDAO.getMedicalRecordByFullName(person.getFirstName(),
 							person.getLastName());
 					int age = calculateAge(medicalRecord.getBirthdate());
 
@@ -179,12 +182,12 @@ public class AlertsService {
 	 */
 	public PhoneAlert getPhoneAlert(String fireStationNumber) {
 		try {
-			List<FireStation> fireStations = fireStationService.getFireStationByStation(fireStationNumber);
+			List<FireStation> fireStations = fireStationDAO.getFireStationByStation(fireStationNumber);
 			List<String> phoneNumbers = new ArrayList<>();
 
 			for (FireStation fireStation : fireStations) {
 				String fireStationAddress = fireStation.getAddress();
-				List<Person> persons = personService.getPersonByAddress(fireStationAddress);
+				List<Person> persons = personDAO.getPersonByAddress(fireStationAddress);
 
 				for (Person person : persons) {
 					phoneNumbers.add(person.getPhone());
@@ -221,16 +224,14 @@ public class AlertsService {
 
 		List<Person> persons;
 		try {
-			persons = personService.getPersonByCity(city);
+			persons = personDAO.getPersonByCity(city).stream().filter(person -> city.equals(person.getCity()))
+					.collect(Collectors.toList());
 		} catch (Exception e) {
 			logger.error("Erreur lors de la récupération des personnes par ville.", e);
 			throw new RuntimeException("Une erreur est survenue lors de la récupération des personnes par ville.", e);
 		}
 
-		List<String> emails = new ArrayList<>();
-		for (Person person : persons) {
-			emails.add(person.getEmail());
-		}
+		List<String> emails = persons.stream().map(Person::getEmail).collect(Collectors.toList());
 
 		CommunityEmail communityEmail = new CommunityEmail();
 		communityEmail.setEmails(emails);
@@ -245,51 +246,40 @@ public class AlertsService {
 	 * spécifiée.
 	 *
 	 * @param address l'adresse où l'incendie s'est produit
-	 * @return une instance de Fire contenant les informations sur les personnes
-	 *         et la caserne de pompiers
+	 * @return une instance de Fire contenant les informations sur les personnes et
+	 *         la caserne de pompiers
 	 */
 	public Fire getFireInformation(String address) {
 		try {
 			// Rechercher les personnes associées à l'adresse spécifiée
-			List<Person> persons = personService.getPersonByAddress(address);
+			List<Person> persons = personDAO.getPersonByAddress(address);
 			if (persons.isEmpty()) {
 				return null;
 			}
 
 			// Récupérer la caserne de pompiers associée à l'adresse
-			FireStation fireStation = fireStationService.getFireStationByAddress(address);
+			FireStation fireStation = fireStationDAO.getFireStationByAddress(address);
 			if (fireStation == null) {
 				return null;
 			}
 
-			// Créer une liste de PersonFire pour stocker les informations sur les
-			// personnes
-			List<PersonFire> personFires = new ArrayList<>();
-
-			for (Person person : persons) {
+			// Créer une liste de PersonFire pour stocker les informations sur les personnes
+			List<PersonFire> personFires = persons.stream().map(person -> {
 				// Récupérer le dossier médical de la personne
-				MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(person.getFirstName(),
+				MedicalRecord medicalRecord = medicalRecordDAO.getMedicalRecordByFullName(person.getFirstName(),
 						person.getLastName());
 
-				// Créer un nouvel objet PersonFire pour stocker les informations sur la
-				// personne
-				String firstName = null;
-				String lastName = null;
-				String phone = null;
-				int age = 0;
-				PersonFire personFire = new PersonFire(firstName, lastName, phone, age, medicalRecord);
-				personFire.setFirstName(person.getFirstName());
-				personFire.setLastName(person.getLastName());
-				personFire.setPhone(person.getPhone());
-				personFire.setAge(calculateAge(medicalRecord.getBirthdate()));
+				// Créer un nouvel objet PersonFire pour stocker les informations sur la personne
+				int age = calculateAge(medicalRecord.getBirthdate());
+				PersonFire personFire = new PersonFire(person.getFirstName(), person.getLastName(), person.getPhone(),
+						age, medicalRecord);
 				personFire.setMedications(medicalRecord.getMedications());
 				personFire.setAllergies(medicalRecord.getAllergies());
 
-				personFires.add(personFire);
-			}
+				return personFire;
+			}).collect(Collectors.toList());
 
-			// Créer un objet Fire avec la liste de PersonFire et le numéro de la
-			// caserne de pompiers
+			// Créer un objet Fire avec la liste de PersonFire et le numéro de la caserne de pompiers
 			Fire fire = new Fire(personFires, fireStation.getStation());
 
 			logger.info("Informations sur l'incendie récupérées avec succès pour l'adresse : " + address);
@@ -312,60 +302,52 @@ public class AlertsService {
 	 *         informations
 	 */
 	public List<FireStationCoverage> getFireStationCoverage(int fireStationNumber) {
-		List<String> fireStationAddresses = new ArrayList<>();
-		List<Person> persons = personService.getAllPersons();
-		List<FireStationCoverage> fireStationCoverages = new ArrayList<>();
+	    List<FireStationCoverage> fireStationCoverages = new ArrayList<>();
 
-		try {
-			// Trouver toutes les adresses des casernes avec le numéro donné
-			for (FireStation fireStation : fireStationService.getAllFireStations()) {
-				if (fireStation.getStation().equals(String.valueOf(fireStationNumber))) {
-					fireStationAddresses.add(fireStation.getAddress());
-				}
-			}
+	    try {
+	        List<String> fireStationAddresses = fireStationDAO.getAllFireStations().stream()
+	                .filter(fireStation -> fireStation.getStation().equals(String.valueOf(fireStationNumber)))
+	                .map(FireStation::getAddress)
+	                .collect(Collectors.toList());
 
-			// Parcourir toutes les personnes vivant à ces adresses et regrouper les
-			// informations demandées
-			for (String address : fireStationAddresses) {
-				int numAdults = 0;
-				int numChildren = 0;
-				List<PersonCoverage> personsCovered = new ArrayList<>();
+	        List<Person> persons = personDAO.getAllPersons();
 
-				for (Person person : persons) {
-					if (person.getAddress().equals(address)) {
-						MedicalRecord medicalRecord = medicalRecordService
-								.getMedicalRecordByFullName(person.getFirstName(), person.getLastName());
-						int age = calculateAge(medicalRecord.getBirthdate());
+	        fireStationAddresses.forEach(address -> {
+	            List<Person> personsCovered = persons.stream()
+	                    .filter(person -> person.getAddress().equals(address))
+	                    .collect(Collectors.toList());
 
-						if (age >= 18) {
-							numAdults++;
-						} else {
-							numChildren++;
-						}
+	            int numAdults = (int) personsCovered.stream()
+	                    .map(person -> calculateAge(medicalRecordDAO.getMedicalRecordByFullName(person.getFirstName(), person.getLastName()).getBirthdate()))
+	                    .filter(age -> age >= 18)
+	                    .count();
 
-						personsCovered.add(new PersonCoverage(person.getFirstName(), person.getLastName(),
-								person.getAddress(), person.getPhone()));
-					}
-				}
+	            int numChildren = personsCovered.size() - numAdults;
 
-				FireStationCoverage fireStationCoverage = new FireStationCoverage();
-				fireStationCoverage.setAddress(address);
-				fireStationCoverage.setNumAdults(numAdults);
-				fireStationCoverage.setNumChildren(numChildren);
-				fireStationCoverage.setPersons(personsCovered);
-				fireStationCoverages.add(fireStationCoverage);
-			}
+	            List<PersonCoverage> personCoverages = personsCovered.stream()
+	                    .map(person -> new PersonCoverage(person.getFirstName(), person.getLastName(), person.getAddress(), person.getPhone()))
+	                    .collect(Collectors.toList());
 
-			// Journal des réponses réussies au niveau Info
-			logger.info("La méthode getFireStationCoverage a été exécutée avec succès.");
+	            FireStationCoverage fireStationCoverage = new FireStationCoverage();
+	            fireStationCoverage.setAddress(address);
+	            fireStationCoverage.setNumAdults(numAdults);
+	            fireStationCoverage.setNumChildren(numChildren);
+	            fireStationCoverage.setPersons(personCoverages);
 
-		} catch (Exception e) {
-			// Enregistrer les erreurs ou exceptions au niveau Erreur
-			logger.error("Une erreur s'est produite lors de l'exécution de la méthode getFireStationCoverage.", e);
-		}
+	            fireStationCoverages.add(fireStationCoverage);
+	        });
 
-		return fireStationCoverages;
+	        // Journal des réponses réussies au niveau Info
+	        logger.info("La méthode getFireStationCoverage a été exécutée avec succès.");
+
+	    } catch (Exception e) {
+	        // Enregistrer les erreurs ou exceptions au niveau Erreur
+	        logger.error("Une erreur s'est produite lors de l'exécution de la méthode getFireStationCoverage.", e);
+	    }
+
+	    return fireStationCoverages;
 	}
+
 
 	/**
 	 * Récupère une liste de casernes affectées par des inondations avec les
@@ -380,29 +362,23 @@ public class AlertsService {
 
 		try {
 			// Trouver toutes les adresses correspondant aux numéros de station donnés
-			List<String> addresses = new ArrayList<>();
-			for (FireStation fireStation : fireStationService.getAllFireStations()) {
-				if (stationNumbers.contains(Integer.parseInt(fireStation.getStation()))) {
-					addresses.add(fireStation.getAddress());
-				}
-			}
+			List<String> addresses = fireStationDAO.getAllFireStations().stream()
+					.filter(fireStation -> stationNumbers.contains(Integer.parseInt(fireStation.getStation())))
+					.map(FireStation::getAddress).collect(Collectors.toList());
 
 			// Parcourir chaque adresse et trouver les personnes correspondantes
 			for (String address : addresses) {
-				List<PersonFlood> persons = new ArrayList<>();
+				List<PersonFlood> persons = personDAO.getAllPersons().stream()
+						.filter(person -> person.getAddress().equals(address)).map(person -> {
+							MedicalRecord medicalRecord = medicalRecordDAO
+									.getMedicalRecordByFullName(person.getFirstName(), person.getLastName());
+							List<String> medications = medicalRecord.getMedications();
+							List<String> allergies = medicalRecord.getAllergies();
+							int age = calculateAge(medicalRecord.getBirthdate());
 
-				for (Person person : personService.getAllPersons()) {
-					if (person.getAddress().equals(address)) {
-						MedicalRecord medicalRecord = medicalRecordService
-								.getMedicalRecordByFullName(person.getFirstName(), person.getLastName());
-						List<String> medications = medicalRecord.getMedications();
-						List<String> allergies = medicalRecord.getAllergies();
-
-						PersonFlood personFlood = new PersonFlood(person.getFirstName(), person.getLastName(),
-								person.getPhone(), calculateAge(medicalRecord.getBirthdate()), medications, allergies);
-						persons.add(personFlood);
-					}
-				}
+							return new PersonFlood(person.getFirstName(), person.getLastName(), person.getPhone(), age,
+									medications, allergies);
+						}).collect(Collectors.toList());
 
 				Flood flood = new Flood(address, persons);
 				floodStations.add(flood);
@@ -417,4 +393,5 @@ public class AlertsService {
 
 		return floodStations;
 	}
+
 }

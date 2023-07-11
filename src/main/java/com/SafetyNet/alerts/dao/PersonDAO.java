@@ -1,6 +1,7 @@
 package com.SafetyNet.alerts.dao;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -12,17 +13,31 @@ import com.SafetyNet.alerts.models.Person;
 public class PersonDAO {
 
     private final List<Person> persons;
+    
     @Autowired
     public PersonDAO(DataConfig dataConfig) {
         this.persons = dataConfig.getPersons();
     }
 
-    // CRUD operations only
-
     public List<Person> getAllPersons() {
         return persons;
     }
 
+    public Person getPersonById(String id) {
+		return getAllPersons().stream().filter(person -> person.getId().equals(id)).findFirst()
+				.orElse(null);
+	}
+
+	public List<Person> getPersonByAddress(String address) {
+		return getAllPersons().stream().filter(person -> person.getAddress().equals(address))
+				.collect(Collectors.toList());
+	}
+
+	public List<Person> getPersonByCity(String city) {
+		return getAllPersons().stream().filter(person -> person.getCity().equals(city))
+				.collect(Collectors.toList());
+	}
+    
     public void addPerson(Person person) {
         persons.add(person);
     }

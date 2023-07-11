@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.SafetyNet.alerts.models.alerts.PhoneAlert;
+import com.SafetyNet.alerts.models.PhoneAlert;
 import com.SafetyNet.alerts.services.AlertsService;
 
 @RestController
