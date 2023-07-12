@@ -2,8 +2,10 @@ package com.SafetyNet.alerts.models;
 
 import java.util.List;
 
+import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
+@ApiModel(description = "Représentation d'un dossier médical")
 @Data
 public class MedicalRecord {
 	private String firstName;

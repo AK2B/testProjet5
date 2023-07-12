@@ -6,15 +6,21 @@ import org.springframework.boot.autoconfigure.web.servlet.error.AbstractErrorCon
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.SafetyNet.alerts.models.Error;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 
-@Controller
+@RestController
 @RequestMapping("/error")
+@Api(tags = "Error API")
 public class CustomErrorController extends AbstractErrorController {
 
     @Autowired
@@ -28,7 +34,12 @@ public class CustomErrorController extends AbstractErrorController {
         return "/error";
     }
 
-    @RequestMapping
+    @GetMapping
+    @ApiOperation("Handle custom error")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Success", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal server error")
+    })
     public ResponseEntity<Error> handleCustomError(HttpServletRequest request) {
         HttpStatus status = getResponseStatus(request);
         ErrorProperties errorProperties = getErrorProperties();
@@ -53,19 +64,19 @@ public class CustomErrorController extends AbstractErrorController {
     }
 
     private ErrorProperties getErrorProperties() {
-		return null;
         // Obtain the ErrorProperties bean from the Spring context
         // You can autowire it if it's available as a bean
 
         // For example:
         // return applicationContext.getBean(ErrorProperties.class);
+        return null;
     }
 
-	public ErrorAttributes getErrorAttributes() {
-		return errorAttributes;
-	}
+    public ErrorAttributes getErrorAttributes() {
+        return errorAttributes;
+    }
 
-	public void setErrorAttributes(ErrorAttributes errorAttributes) {
-		this.errorAttributes = errorAttributes;
-	}
+    public void setErrorAttributes(ErrorAttributes errorAttributes) {
+        this.errorAttributes = errorAttributes;
+    }
 }

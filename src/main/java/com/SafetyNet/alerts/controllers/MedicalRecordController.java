@@ -17,8 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.SafetyNet.alerts.models.MedicalRecord;
 import com.SafetyNet.alerts.services.MedicalRecordService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @RequestMapping("/medicalrecord")
+@Api(tags = "Medical Record API")
 public class MedicalRecordController {
     private MedicalRecordService medicalRecordService;
 
@@ -28,12 +34,21 @@ public class MedicalRecordController {
     }
 
     @GetMapping
+    @ApiOperation("Get all medical records")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Success", response = MedicalRecord.class, responseContainer = "List")
+    })
     public ResponseEntity<List<MedicalRecord>> getAllMedicalRecords() {
         List<MedicalRecord> medicalRecords = medicalRecordService.getAllMedicalRecords();
         return ResponseEntity.ok(medicalRecords);
     }
 
     @GetMapping("/{firstName}/{lastName}")
+    @ApiOperation("Get medical record by full name")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Success", response = MedicalRecord.class),
+        @ApiResponse(code = 404, message = "Medical record not found")
+    })
     public ResponseEntity<MedicalRecord> getMedicalRecordByFullName(
             @PathVariable String firstName, @PathVariable String lastName) {
         MedicalRecord medicalRecord = medicalRecordService.getMedicalRecordByFullName(firstName, lastName);
@@ -45,12 +60,21 @@ public class MedicalRecordController {
     }
 
     @PostMapping
+    @ApiOperation("Add a new medical record")
+    @ApiResponses({
+        @ApiResponse(code = 201, message = "Medical record created")
+    })
     public ResponseEntity<String> addMedicalRecord(@RequestBody MedicalRecord medicalRecord) {
         medicalRecordService.addMedicalRecord(medicalRecord);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/{firstName}/{lastName}")
+    @ApiOperation("Update a medical record")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Medical record updated"),
+        @ApiResponse(code = 404, message = "Medical record not found")
+    })
     public ResponseEntity<String> updateMedicalRecord(
             @PathVariable String firstName, @PathVariable String lastName, @RequestBody MedicalRecord medicalRecord) {
         MedicalRecord existingMedicalRecord = medicalRecordService.getMedicalRecordByFullName(firstName, lastName);
@@ -65,6 +89,10 @@ public class MedicalRecordController {
     }
 
     @DeleteMapping("/{firstName}/{lastName}")
+    @ApiOperation("Delete a medical record")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Medical record deleted")
+    })
     public ResponseEntity<String> deleteMedicalRecord(
             @PathVariable String firstName, @PathVariable String lastName) {
         medicalRecordService.deleteMedicalRecord(firstName, lastName);

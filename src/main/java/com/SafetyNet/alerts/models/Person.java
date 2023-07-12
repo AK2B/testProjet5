@@ -1,7 +1,9 @@
 package com.SafetyNet.alerts.models;
 
+import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
+@ApiModel(description = "Représentation d'une personne")
 @Data
 public class Person {
 	

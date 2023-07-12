@@ -17,8 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.SafetyNet.alerts.models.Person;
 import com.SafetyNet.alerts.services.PersonService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @RequestMapping("/person")
+@Api(tags = "Person API")
 public class PersonController {
     private PersonService personService;
 
@@ -28,12 +34,21 @@ public class PersonController {
     }
 
     @GetMapping
+    @ApiOperation("Get all persons")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Success", response = Person.class, responseContainer = "List")
+    })
     public ResponseEntity<List<Person>> getAllPersons() {
         List<Person> persons = personService.getAllPersons();
         return ResponseEntity.ok(persons);
     }
 
     @GetMapping("/{id}")
+    @ApiOperation("Get a person by ID")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Success", response = Person.class),
+        @ApiResponse(code = 404, message = "Person not found")
+    })
     public ResponseEntity<Person> getPersonById(@PathVariable String id) {       
         Person person = personService.getPersonById(id);
         if (person != null) {
@@ -44,12 +59,21 @@ public class PersonController {
     }
 
     @PostMapping
+    @ApiOperation("Add a new person")
+    @ApiResponses({
+        @ApiResponse(code = 201, message = "Person created")
+    })
     public ResponseEntity<String> addPerson(@RequestBody Person person) {
         personService.addPerson(person);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/{id}")
+    @ApiOperation("Update a person")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Person updated"),
+        @ApiResponse(code = 404, message = "Person not found")
+    })
     public ResponseEntity<String> updatePerson(@PathVariable String id, @RequestBody Person person) {
         Person existingPerson = personService.getPersonById(id);
         if (existingPerson != null) {
@@ -62,6 +86,10 @@ public class PersonController {
     }
 
     @DeleteMapping("/{firstName}/{lastName}")
+    @ApiOperation("Delete a person")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Person deleted")
+    })
     public ResponseEntity<String> deletePerson(@PathVariable String firstName, @PathVariable String lastName) {
         personService.deletePerson(firstName, lastName);
         return ResponseEntity.ok().build();

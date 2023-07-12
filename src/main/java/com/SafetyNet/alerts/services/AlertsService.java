@@ -250,48 +250,45 @@ public class AlertsService {
 	 *         la caserne de pompiers
 	 */
 	public Fire getFireInformation(String address) {
-		try {
-			// Rechercher les personnes associées à l'adresse spécifiée
-			List<Person> persons = personDAO.getPersonByAddress(address);
-			if (persons.isEmpty()) {
-				return null;
-			}
+	    try {
+	        // Rechercher les personnes associées à l'adresse spécifiée
+	        List<Person> persons = personDAO.getPersonByAddress(address);
+	        if (persons.isEmpty()) {
+	            return null;
+	        }
 
-			// Récupérer la caserne de pompiers associée à l'adresse
-			FireStation fireStation = fireStationDAO.getFireStationByAddress(address);
-			if (fireStation == null) {
-				return null;
-			}
+	        // Récupérer la caserne de pompiers associée à l'adresse
+	        FireStation fireStation = fireStationDAO.getFireStationByAddress(address);
+	        if (fireStation == null) {
+	            return null;
+	        }
 
-			// Créer une liste de PersonFire pour stocker les informations sur les personnes
-			List<PersonFire> personFires = persons.stream().map(person -> {
-				// Récupérer le dossier médical de la personne
-				MedicalRecord medicalRecord = medicalRecordDAO.getMedicalRecordByFullName(person.getFirstName(),
-						person.getLastName());
+	        // Créer une liste de PersonFire pour stocker les informations sur les personnes
+	        List<PersonFire> personFires = persons.stream().map(person -> {
+	            // Récupérer le dossier médical de la personne
+	            MedicalRecord medicalRecord = medicalRecordDAO.getMedicalRecordByFullName(person.getFirstName(),
+	                    person.getLastName());
 
-				// Créer un nouvel objet PersonFire pour stocker les informations sur la personne
-				int age = calculateAge(medicalRecord.getBirthdate());
-				PersonFire personFire = new PersonFire(person.getFirstName(), person.getLastName(), person.getPhone(),
-						age, medicalRecord);
-				personFire.setMedications(medicalRecord.getMedications());
-				personFire.setAllergies(medicalRecord.getAllergies());
+	            // Créer un nouvel objet PersonFire pour stocker les informations sur la personne
+	            int age = calculateAge(medicalRecord.getBirthdate());
+	            PersonFire personFire = new PersonFire(person.getFirstName(), person.getLastName(), person.getPhone(), age, medicalRecord.getMedications(), medicalRecord.getAllergies());
 
-				return personFire;
-			}).collect(Collectors.toList());
+	            return personFire;
+	        }).collect(Collectors.toList());
 
-			// Créer un objet Fire avec la liste de PersonFire et le numéro de la caserne de pompiers
-			Fire fire = new Fire(personFires, fireStation.getStation());
+	        // Créer un objet Fire avec la liste de PersonFire et le numéro de la caserne de pompiers
+	        Fire fire = new Fire(personFires, fireStation.getStation());
 
-			logger.info("Informations sur l'incendie récupérées avec succès pour l'adresse : " + address);
-			return fire;
-		} catch (Exception e) {
-			logger.error("Erreur lors de la récupération des informations sur l'incendie pour l'adresse : " + address,
-					e);
-			// Gérer l'erreur ou la propager selon vos besoins
-			// ...
-			return null;
-		}
+	        logger.info("Informations sur l'incendie récupérées avec succès pour l'adresse : " + address);
+	        return fire;
+	    } catch (Exception e) {
+	        logger.error("Erreur lors de la récupération des informations sur l'incendie pour l'adresse : " + address, e);
+	        // Gérer l'erreur ou la propager selon vos besoins
+	        // ...
+	        return null;
+	    }
 	}
+
 
 	/**
 	 * Récupère les informations des personnes couvertes par la caserne de pompiers
@@ -328,7 +325,7 @@ public class AlertsService {
 	                    .map(person -> new PersonCoverage(person.getFirstName(), person.getLastName(), person.getAddress(), person.getPhone()))
 	                    .collect(Collectors.toList());
 
-	            FireStationCoverage fireStationCoverage = new FireStationCoverage();
+	            FireStationCoverage fireStationCoverage = new FireStationCoverage(address, numChildren, numChildren, personCoverages);
 	            fireStationCoverage.setAddress(address);
 	            fireStationCoverage.setNumAdults(numAdults);
 	            fireStationCoverage.setNumChildren(numChildren);

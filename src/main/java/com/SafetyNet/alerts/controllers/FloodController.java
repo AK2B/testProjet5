@@ -11,19 +11,31 @@ import org.springframework.web.bind.annotation.RestController;
 import com.SafetyNet.alerts.models.Flood;
 import com.SafetyNet.alerts.services.AlertsService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @RequestMapping("/flood/stations")
+@Api(tags = "Flood API")
 public class FloodController {
 	
-	private AlertsService dtoService;
+    private AlertsService alertsService;
 	
-	@Autowired
-    public FloodController(AlertsService dtoService) {
-		this.dtoService = dtoService;
+    @Autowired
+    public FloodController(AlertsService alertsService) {
+        this.alertsService = alertsService;
     }
 
     @GetMapping
+    @ApiOperation("Get flood stations")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Success", response = Flood.class, responseContainer = "List"),
+        @ApiResponse(code = 404, message = "Flood stations not found"),
+        @ApiResponse(code = 500, message = "Internal server error")
+    })
     public List<Flood> getFloodStations(@RequestParam("stations") List<Integer> stationNumbers) {
-        return dtoService.getFloodStations(stationNumbers);
+        return alertsService.getFloodStations(stationNumbers);
     }
 }

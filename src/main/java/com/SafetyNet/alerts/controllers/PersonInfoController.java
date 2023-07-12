@@ -11,20 +11,30 @@ import org.springframework.web.bind.annotation.RestController;
 import com.SafetyNet.alerts.models.PersonInfo;
 import com.SafetyNet.alerts.services.AlertsService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @RequestMapping("/personInfo")
+@Api(tags = "Person Info API")
 public class PersonInfoController {
-    
-	private AlertsService dtoService;
+
+    private AlertsService alertsService;
 
     @Autowired
-    public PersonInfoController(AlertsService dtoService) {
-        this.dtoService = dtoService;
+    public PersonInfoController(AlertsService alertsService) {
+        this.alertsService = alertsService;
     }
 
     @GetMapping
+    @ApiOperation("Get person info")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Success", response = PersonInfo.class, responseContainer = "List"),
+        @ApiResponse(code = 500, message = "Internal server error")
+    })
     public List<PersonInfo> getPersonInfo(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
-    	return dtoService.getPersonInfo(firstName, lastName);
+        return alertsService.getPersonInfo(firstName, lastName);
     }
-    
 }
