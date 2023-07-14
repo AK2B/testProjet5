@@ -11,14 +11,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.SafetyNet.alerts.models.Flood;
 import com.SafetyNet.alerts.services.AlertsService;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/flood/stations")
-@Api(tags = "Flood API")
+@Tag (name = "flood" , description ="Flood API")
 public class FloodController {
 	
     private AlertsService alertsService;
@@ -29,11 +31,11 @@ public class FloodController {
     }
 
     @GetMapping
-    @ApiOperation("Get flood stations")
+    @Operation(summary = "Get flood stations")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Success", response = Flood.class, responseContainer = "List"),
-        @ApiResponse(code = 404, message = "Flood stations not found"),
-        @ApiResponse(code = 500, message = "Internal server error")
+        @ApiResponse(responseCode = "200", description = "Success", content = { @Content(schema = @Schema(implementation = Flood.class), mediaType = "application/json") }),
+        @ApiResponse(responseCode = "404", description = "Flood stations not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public List<Flood> getFloodStations(@RequestParam("stations") List<Integer> stationNumbers) {
         return alertsService.getFloodStations(stationNumbers);

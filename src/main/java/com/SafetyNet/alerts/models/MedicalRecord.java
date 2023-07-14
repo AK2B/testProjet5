@@ -2,10 +2,10 @@ package com.SafetyNet.alerts.models;
 
 import java.util.List;
 
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-@ApiModel(description = "Représentation d'un dossier médical")
+@Schema(description = "Représentation d'un dossier médical")
 @Data
 public class MedicalRecord {
 	private String firstName;

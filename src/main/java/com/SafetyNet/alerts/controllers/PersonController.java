@@ -17,14 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.SafetyNet.alerts.models.Person;
 import com.SafetyNet.alerts.services.PersonService;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/person")
-@Api(tags = "Person API")
+@Tag (name = "person" , description = "Person API")
 public class PersonController {
     private PersonService personService;
 
@@ -34,9 +36,9 @@ public class PersonController {
     }
 
     @GetMapping
-    @ApiOperation("Get all persons")
+    @Operation(summary = "Get all persons")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Success", response = Person.class, responseContainer = "List")
+        @ApiResponse(responseCode = "200", description = "Success", content = { @Content(schema = @Schema(implementation = Person.class), mediaType = "application/json") }),
     })
     public ResponseEntity<List<Person>> getAllPersons() {
         List<Person> persons = personService.getAllPersons();
@@ -44,10 +46,10 @@ public class PersonController {
     }
 
     @GetMapping("/{id}")
-    @ApiOperation("Get a person by ID")
+    @Operation(summary = "Get a person by ID")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Success", response = Person.class),
-        @ApiResponse(code = 404, message = "Person not found")
+        @ApiResponse(responseCode = "200", description = "Success", content = { @Content(schema = @Schema(implementation = Person.class), mediaType = "application/json") }),
+        @ApiResponse(responseCode = "404", description = "Person not found")
     })
     public ResponseEntity<Person> getPersonById(@PathVariable String id) {       
         Person person = personService.getPersonById(id);
@@ -59,9 +61,9 @@ public class PersonController {
     }
 
     @PostMapping
-    @ApiOperation("Add a new person")
+    @Operation(summary = "Add a new person")
     @ApiResponses({
-        @ApiResponse(code = 201, message = "Person created")
+        @ApiResponse(responseCode = "201", description = "Person created")
     })
     public ResponseEntity<String> addPerson(@RequestBody Person person) {
         personService.addPerson(person);
@@ -69,10 +71,10 @@ public class PersonController {
     }
 
     @PutMapping("/{id}")
-    @ApiOperation("Update a person")
+    @Operation(summary = "Update a person")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Person updated"),
-        @ApiResponse(code = 404, message = "Person not found")
+        @ApiResponse(responseCode = "200", description = "Person updated"),
+        @ApiResponse(responseCode = "404", description = "Person not found")
     })
     public ResponseEntity<String> updatePerson(@PathVariable String id, @RequestBody Person person) {
         Person existingPerson = personService.getPersonById(id);
@@ -86,9 +88,9 @@ public class PersonController {
     }
 
     @DeleteMapping("/{firstName}/{lastName}")
-    @ApiOperation("Delete a person")
+    @Operation(summary = "Delete a person")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Person deleted")
+        @ApiResponse(responseCode = "200", description = "Person deleted")
     })
     public ResponseEntity<String> deletePerson(@PathVariable String firstName, @PathVariable String lastName) {
         personService.deletePerson(firstName, lastName);

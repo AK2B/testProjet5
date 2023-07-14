@@ -12,15 +12,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.SafetyNet.alerts.models.Error;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/error")
-@Api(tags = "Error API")
+@Tag (name = "error" , description = "Error API")
 public class CustomErrorController extends AbstractErrorController {
 
     @Autowired
@@ -35,10 +37,10 @@ public class CustomErrorController extends AbstractErrorController {
     }
 
     @GetMapping
-    @ApiOperation("Handle custom error")
+    @Operation(summary = "Handle custom error")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Success", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal server error")
+        @ApiResponse(responseCode = "200", description = "Success", content = { @Content(schema = @Schema(implementation = Error.class), mediaType = "application/json") }),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<Error> handleCustomError(HttpServletRequest request) {
         HttpStatus status = getResponseStatus(request);

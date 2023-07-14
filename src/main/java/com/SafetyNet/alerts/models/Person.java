@@ -1,9 +1,9 @@
 package com.SafetyNet.alerts.models;
 
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-@ApiModel(description = "Représentation d'une personne")
+@Schema(description = "Représentation d'une personne")
 @Data
 public class Person {
 	

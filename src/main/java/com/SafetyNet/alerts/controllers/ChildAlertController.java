@@ -9,14 +9,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.SafetyNet.alerts.models.ChildAlert;
 import com.SafetyNet.alerts.services.AlertsService;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/childAlert")
-@Api(tags = "Child Alert API")
+@Tag (name= "childAlert" , description= "Child Alert API")
 public class ChildAlertController {
     private AlertsService alertsService;
 
@@ -26,11 +28,11 @@ public class ChildAlertController {
     }
 
     @GetMapping
-    @ApiOperation("Get child alert by address")
+    @Operation(summary="Get child alert by address")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Success", response = ChildAlert.class),
-        @ApiResponse(code = 404, message = "Address not found"),
-        @ApiResponse(code = 500, message = "Internal server error")
+    	@ApiResponse(responseCode = "200", description = "Success", content = { @Content(schema = @Schema(implementation = ChildAlert.class), mediaType = "application/json") }),
+    	@ApiResponse(responseCode = "404", description = "Address not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ChildAlert getChildAlert(@RequestParam("address") String address) throws Exception {
         return alertsService.getChildAlert(address);

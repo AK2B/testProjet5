@@ -17,14 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.SafetyNet.alerts.models.FireStation;
 import com.SafetyNet.alerts.services.FireStationService;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/firestations")
-@Api(tags = "Fire Station API")
+@Tag (name = "fireStation" , description = "Fire Station API")
 public class FireStationController {
     private FireStationService fireStationService;
 
@@ -34,9 +36,9 @@ public class FireStationController {
     }
 
     @GetMapping
-    @ApiOperation("Get all fire stations")
-    @ApiResponses({
-        @ApiResponse(code = 200, message = "Success", response = FireStation.class, responseContainer = "List")
+    @Operation(summary = "Get all fire stations")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Success", content = { @Content(schema = @Schema(implementation = FireStation.class), mediaType = "application/json") })
     })
     public ResponseEntity<List<FireStation>> getAllFireStations() {
         List<FireStation> fireStations = fireStationService.getAllFireStations();
@@ -44,10 +46,10 @@ public class FireStationController {
     }
 
     @GetMapping("/{address}")
-    @ApiOperation("Get fire station by address")
+    @Operation(summary = "Get fire station by address")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Success", response = FireStation.class),
-        @ApiResponse(code = 404, message = "Fire station not found")
+        @ApiResponse(responseCode = "200", description = "Success", content = { @Content(schema = @Schema(implementation = FireStation.class), mediaType = "application/json") }),
+        @ApiResponse(responseCode = "404", description = "Fire station not found")
     })
     public ResponseEntity<FireStation> getFireStationByAddress(@PathVariable String address) {
         FireStation fireStation = fireStationService.getFireStationByAddress(address);
@@ -59,9 +61,9 @@ public class FireStationController {
     }
 
     @PostMapping
-    @ApiOperation("Add a new fire station")
+    @Operation(summary = "Add a new fire station")
     @ApiResponses({
-        @ApiResponse(code = 201, message = "Fire station created")
+        @ApiResponse(responseCode = "201", description = "Fire station created")
     })
     public ResponseEntity<String> addFireStation(@RequestBody FireStation fireStation) {
         fireStationService.addFireStation(fireStation);
@@ -69,10 +71,10 @@ public class FireStationController {
     }
 
     @PutMapping("/{address}")
-    @ApiOperation("Update a fire station")
+    @Operation(summary = "Update a fire station")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Fire station updated"),
-        @ApiResponse(code = 404, message = "Fire station not found")
+        @ApiResponse(responseCode = "200", description = "Fire station updated"),
+        @ApiResponse(responseCode = "404", description = "Fire station not found")
     })
     public ResponseEntity<String> updateFireStation(@PathVariable String address, @RequestBody FireStation fireStation) {
         FireStation existingFireStation = fireStationService.getFireStationByAddress(address);
@@ -86,9 +88,9 @@ public class FireStationController {
     }
 
     @DeleteMapping("/{address}")
-    @ApiOperation("Delete a fire station")
+    @Operation(summary = "Delete a fire station")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Fire station deleted")
+        @ApiResponse(responseCode = "200", description = "Fire station deleted")
     })
     public ResponseEntity<String> deleteFireStation(@PathVariable String address) {
         fireStationService.deleteFireStation(address);

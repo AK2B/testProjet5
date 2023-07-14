@@ -9,14 +9,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.SafetyNet.alerts.models.Fire;
 import com.SafetyNet.alerts.services.AlertsService;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/fire")
-@Api(tags = "Fire API")
+@Tag (name = "fire" , description = "Fire API")
 public class FireController {
     private AlertsService alertsService;
 
@@ -26,11 +28,11 @@ public class FireController {
     }
 
     @GetMapping
-    @ApiOperation("Get fire details by address")
+    @Operation(summary = "Get fire details by address")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Success", response = Fire.class),
-        @ApiResponse(code = 404, message = "Address not found"),
-        @ApiResponse(code = 500, message = "Internal server error")
+        @ApiResponse(responseCode = "200", description = "Success", content = { @Content(schema = @Schema(implementation = Fire.class), mediaType = "application/json") }),
+        @ApiResponse(responseCode = "404", description = "Address not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public Fire getFireDetails(@RequestParam("address") String address) {
         return alertsService.getFireInformation(address);

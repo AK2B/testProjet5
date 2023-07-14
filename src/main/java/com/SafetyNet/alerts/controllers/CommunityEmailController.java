@@ -9,14 +9,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.SafetyNet.alerts.models.CommunityEmail;
 import com.SafetyNet.alerts.services.AlertsService;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/communityEmail")
-@Api(tags = "Community Email API")
+@Tag (name = "communityEmail" , description = "Community Email API")
 public class CommunityEmailController {
 
     private AlertsService alertsService;
@@ -27,11 +29,11 @@ public class CommunityEmailController {
     }
 
     @GetMapping
-    @ApiOperation("Get community emails by city")
+    @Operation(summary ="Get community emails by city")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Success", response = CommunityEmail.class),
-        @ApiResponse(code = 404, message = "City not found"),
-        @ApiResponse(code = 500, message = "Internal server error")
+        @ApiResponse(responseCode = "200", description = "Success", content = { @Content(schema = @Schema(implementation = CommunityEmail.class), mediaType = "application/json") }),
+        @ApiResponse(responseCode = "404", description = "City not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public CommunityEmail getCommunityEmails(@RequestParam("city") String city) {
         return alertsService.getCommunityEmails(city);

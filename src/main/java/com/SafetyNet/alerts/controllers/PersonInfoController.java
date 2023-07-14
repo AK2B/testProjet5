@@ -11,14 +11,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.SafetyNet.alerts.models.PersonInfo;
 import com.SafetyNet.alerts.services.AlertsService;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/personInfo")
-@Api(tags = "Person Info API")
+@Tag(name = "personInfo" , description = "Person Info API")
 public class PersonInfoController {
 
     private AlertsService alertsService;
@@ -29,10 +31,10 @@ public class PersonInfoController {
     }
 
     @GetMapping
-    @ApiOperation("Get person info")
+    @Operation(summary = "Get person info")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Success", response = PersonInfo.class, responseContainer = "List"),
-        @ApiResponse(code = 500, message = "Internal server error")
+        @ApiResponse(responseCode = "200", description = "Success", content = { @Content(schema = @Schema(implementation = PersonInfo.class), mediaType = "application/json") }),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public List<PersonInfo> getPersonInfo(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
         return alertsService.getPersonInfo(firstName, lastName);

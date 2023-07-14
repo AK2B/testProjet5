@@ -17,14 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.SafetyNet.alerts.models.MedicalRecord;
 import com.SafetyNet.alerts.services.MedicalRecordService;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/medicalrecord")
-@Api(tags = "Medical Record API")
+@Tag (name = "medicalRecord" , description = "Medical Record API")
 public class MedicalRecordController {
     private MedicalRecordService medicalRecordService;
 
@@ -34,9 +36,9 @@ public class MedicalRecordController {
     }
 
     @GetMapping
-    @ApiOperation("Get all medical records")
+    @Operation(summary = "Get all medical records")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Success", response = MedicalRecord.class, responseContainer = "List")
+        @ApiResponse(responseCode = "200", description = "Success", content = { @Content(schema = @Schema(implementation = MedicalRecord.class), mediaType = "application/json") }),
     })
     public ResponseEntity<List<MedicalRecord>> getAllMedicalRecords() {
         List<MedicalRecord> medicalRecords = medicalRecordService.getAllMedicalRecords();
@@ -44,10 +46,10 @@ public class MedicalRecordController {
     }
 
     @GetMapping("/{firstName}/{lastName}")
-    @ApiOperation("Get medical record by full name")
+    @Operation(summary = "Get medical record by full name")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Success", response = MedicalRecord.class),
-        @ApiResponse(code = 404, message = "Medical record not found")
+        @ApiResponse(responseCode = "200", description = "Success", content = { @Content(schema = @Schema(implementation = MedicalRecord.class), mediaType = "application/json") }),
+        @ApiResponse(responseCode = "404", description = "Medical record not found")
     })
     public ResponseEntity<MedicalRecord> getMedicalRecordByFullName(
             @PathVariable String firstName, @PathVariable String lastName) {
@@ -60,9 +62,9 @@ public class MedicalRecordController {
     }
 
     @PostMapping
-    @ApiOperation("Add a new medical record")
+    @Operation(summary = "Add a new medical record")
     @ApiResponses({
-        @ApiResponse(code = 201, message = "Medical record created")
+        @ApiResponse(responseCode = "201", description = "Medical record created")
     })
     public ResponseEntity<String> addMedicalRecord(@RequestBody MedicalRecord medicalRecord) {
         medicalRecordService.addMedicalRecord(medicalRecord);
@@ -70,10 +72,10 @@ public class MedicalRecordController {
     }
 
     @PutMapping("/{firstName}/{lastName}")
-    @ApiOperation("Update a medical record")
+    @Operation(summary = "Update a medical record")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Medical record updated"),
-        @ApiResponse(code = 404, message = "Medical record not found")
+        @ApiResponse(responseCode = "200", description = "Medical record updated"),
+        @ApiResponse(responseCode = "404", description = "Medical record not found")
     })
     public ResponseEntity<String> updateMedicalRecord(
             @PathVariable String firstName, @PathVariable String lastName, @RequestBody MedicalRecord medicalRecord) {
@@ -89,9 +91,9 @@ public class MedicalRecordController {
     }
 
     @DeleteMapping("/{firstName}/{lastName}")
-    @ApiOperation("Delete a medical record")
+    @Operation(summary = "Delete a medical record")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Medical record deleted")
+        @ApiResponse(responseCode = "200", description = "Medical record deleted")
     })
     public ResponseEntity<String> deleteMedicalRecord(
             @PathVariable String firstName, @PathVariable String lastName) {
